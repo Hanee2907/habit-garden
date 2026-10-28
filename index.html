@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Garden - Grow your habits</title>
+  <meta name="description" content="A habit tracker where every habit is a plant that grows with your streak.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- Header -->
+    <header class="top">
+      <div class="brand">
+        <img src="favicon.svg" alt="" class="brand-icon">
+        <div>
+          <h1>Habit Garden</h1>
+          <p class="tagline">Small habits, big blooms</p>
+        </div>
+      </div>
+
+      <div class="level-box">
+        <div class="level-row">
+          <span id="season-badge" class="season-badge">🍂 Autumn</span>
+          <span class="level-text">Gardener level <strong id="level">1</strong></span>
+        </div>
+        <div class="level-bar"><span id="level-fill"></span></div>
+        <p id="level-hint" class="level-hint"></p>
+      </div>
+    </header>
+
+    <!-- The garden scene -->
+    <section id="garden" class="garden" aria-label="Your garden">
+      <div class="sky-light"></div>
+      <div class="sun-moon"></div>
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div id="particles" class="particles" aria-hidden="true"></div>
+      <div class="hill hill-back"></div>
+      <div class="hill hill-front"></div>
+
+      <p id="greeting" class="greeting"></p>
+
+      <!-- Plants go here -->
+      <div id="beds" class="beds"></div>
+
+      <div id="empty" class="empty hidden">
+        <p class="empty-title">Your garden is waiting 🌱</p>
+        <p>Plant your first habit below, or peek at a grown garden.</p>
+        <button id="demo-btn" class="btn btn-light">Show me a demo garden</button>
+      </div>
+    </section>
+
+    <div class="below">
+
+      <!-- Plant a new habit -->
+      <section class="card plant-form">
+        <h2>Plant a new habit</h2>
+
+        <label class="label" for="habit-name">What do you want to do every day?</label>
+        <input id="habit-name" type="text" maxlength="28" placeholder="Read 10 pages">
+
+        <p class="label">Choose a seed</p>
+        <div id="seed-picker" class="seed-picker" role="radiogroup" aria-label="Plant type"></div>
+
+        <p id="form-error" class="form-error"></p>
+        <button id="plant-btn" class="btn btn-main">Plant it 🌱</button>
+      </section>
+
+      <!-- Stats -->
+      <section class="card stats-card">
+        <h2>Garden report</h2>
+        <div class="stats">
+          <div class="stat"><span id="stat-today" class="stat-value">0/0</span><span class="stat-label">watered today</span></div>
+          <div class="stat"><span id="stat-best" class="stat-value">0</span><span class="stat-label">best streak</span></div>
+          <div class="stat"><span id="stat-total" class="stat-value">0</span><span class="stat-label">total waterings</span></div>
+          <div class="stat"><span id="stat-health" class="stat-value">100%</span><span class="stat-label">garden health</span></div>
+        </div>
+
+        <p class="label">Last 14 days</p>
+        <div id="heatmap" class="heatmap"></div>
+      </section>
+
+      <!-- How it works -->
+      <section class="card guide">
+        <h2>How plants grow</h2>
+        <ol class="stages">
+          <li><span>🟤</span><b>Seed</b>just planted</li>
+          <li><span>🌱</span><b>Sprout</b>1+ days</li>
+          <li><span>🌿</span><b>Young</b>3+ days</li>
+          <li><span>🫛</span><b>Bud</b>7+ days</li>
+          <li><span>🌼</span><b>Flower</b>14+ days</li>
+          <li><span>🦋</span><b>Full bloom</b>30+ days</li>
+        </ol>
+        <p class="guide-note">Plants are kind: miss one day and they get thirsty, but your streak is safe if you water today. Miss 3 days and they start to wilt. Water again to bring them back!</p>
+      </section>
+    </div>
+
+    <footer class="bottom">
+      <button id="reset-btn" class="btn btn-soft">Start a fresh garden</button>
+      <p>Made with HTML, CSS &amp; JavaScript · Your garden is saved in your browser</p>
+    </footer>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

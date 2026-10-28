@@ -1,0 +1,944 @@
+/* ================================
+   Habit Garden - grow your habits
+   ================================ */
+
+:root {
+  --cream: #fffaf0;
+  --cream-2: #fff3dc;
+  --ink: #2e3b2a;
+  --ink-soft: #66735f;
+  --leaf: #4caf50;
+  --leaf-dark: #2f7d32;
+  --leaf-light: #c8eeb0;
+  --pot: #d9774a;
+  --sun: #ffd166;
+  --pink: #ff8fab;
+  --water: #4fb3f6;
+  --thirsty: #e7a33e;
+  --wilted: #b0805a;
+
+  --font-title: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --radius: 26px;
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --shadow: 0 14px 34px rgba(46, 59, 42, 0.14);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(60% 40% at 0% 0%, #e6f7d4 0%, transparent 70%),
+    radial-gradient(50% 40% at 100% 10%, #fff0d6 0%, transparent 70%),
+    #f6fbef;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 16px 36px;
+}
+
+h1, h2, .stat-value, .greeting, .empty-title, .plant-name {
+  font-family: var(--font-title);
+}
+
+/* ---------- Header ---------- */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 56px;
+  height: 56px;
+  transition: transform 0.5s var(--bounce);
+}
+
+.brand:hover .brand-icon {
+  transform: rotate(-10deg) scale(1.1);
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--leaf-dark);
+}
+
+.tagline {
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.level-box {
+  min-width: 260px;
+  padding: 12px 16px;
+  border-radius: 20px;
+  background: var(--cream);
+  box-shadow: var(--shadow);
+}
+
+.level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.season-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--cream-2);
+  font-size: 0.82rem;
+}
+
+.level-text strong {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  color: var(--leaf-dark);
+}
+
+.level-bar {
+  height: 10px;
+  margin-top: 8px;
+  border-radius: 10px;
+  background: #e8efdf;
+  overflow: hidden;
+}
+
+.level-bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #9be15d, var(--leaf));
+  transition: width 0.9s var(--bounce);
+}
+
+.level-hint {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- Garden scene ---------- */
+
+.garden {
+  position: relative;
+  min-height: 470px;
+  padding: 110px 20px 30px;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  isolation: isolate;
+}
+
+/* Sky colours change with the season */
+.sky-light {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  transition: background 1.2s;
+  background: linear-gradient(180deg, #8fd3ff 0%, #c9ecff 55%, #f3fbff 100%);
+}
+
+.season-spring .sky-light { background: linear-gradient(180deg, #9ad8ff 0%, #d7f0ff 50%, #fff0f5 100%); }
+.season-summer .sky-light { background: linear-gradient(180deg, #4fb8ff 0%, #a9e1ff 55%, #fff7d1 100%); }
+.season-autumn .sky-light { background: linear-gradient(180deg, #ffb37a 0%, #ffd7a3 50%, #fff2dc 100%); }
+.season-winter .sky-light { background: linear-gradient(180deg, #a9c3e6 0%, #dce8f7 55%, #f7fbff 100%); }
+.is-night .sky-light      { background: linear-gradient(180deg, #16204a 0%, #2c3a75 60%, #4a4f8c 100%); }
+
+/* Sun by day, moon by night */
+.sun-moon {
+  position: absolute;
+  top: 26px;
+  right: 9%;
+  z-index: -2;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fffbe0, var(--sun) 60%, #ffb703);
+  box-shadow: 0 0 0 14px rgba(255, 209, 102, 0.25), 0 0 0 30px rgba(255, 209, 102, 0.12);
+  animation: glow 5s ease-in-out infinite;
+}
+
+.is-night .sun-moon {
+  background: radial-gradient(circle at 35% 35%, #ffffff, #f1ecc8 70%);
+  box-shadow: 0 0 0 12px rgba(241, 236, 200, 0.12), 0 0 40px rgba(241, 236, 200, 0.4);
+}
+
+@keyframes glow {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* Fluffy clouds */
+.cloud {
+  position: absolute;
+  z-index: -2;
+  width: 120px;
+  height: 36px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  animation: cloud-move linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.cloud::before { width: 54px; height: 54px; top: -26px; left: 18px; }
+.cloud::after  { width: 42px; height: 42px; top: -18px; right: 18px; }
+
+.c1 { top: 40px;  animation-duration: 55s; animation-delay: -10s; }
+.c2 { top: 90px;  animation-duration: 75s; animation-delay: -40s; transform: scale(0.7); }
+
+.is-night .cloud { background: rgba(255, 255, 255, 0.15); }
+
+@keyframes cloud-move {
+  from { left: -160px; }
+  to   { left: 105%; }
+}
+
+/* Rolling hills */
+.hill {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  z-index: -1;
+  border-radius: 50% 50% 0 0;
+}
+
+/* Hills fill everything below the sky, so every row of plants sits on grass */
+.hill-back {
+  bottom: 0;
+  height: calc(100% - 150px);
+  border-radius: 50% 50% 0 0 / 140px 140px 0 0;
+  background: #a8dc84;
+  transform: translateX(14%);
+}
+
+.hill-front {
+  bottom: 0;
+  height: calc(100% - 200px);
+  border-radius: 50% 50% 0 0 / 120px 120px 0 0;
+  background: linear-gradient(180deg, #7cc65a, #5aa844);
+}
+
+.season-autumn .hill-back  { background: #c9d27a; }
+.season-autumn .hill-front { background: linear-gradient(180deg, #a6c45a, #7fa64a); }
+.season-winter .hill-back  { background: #eef4fb; }
+.season-winter .hill-front { background: linear-gradient(180deg, #ffffff, #dfe9f5); }
+.is-night .hill-back       { background: #3d6b4a; }
+.is-night .hill-front      { background: linear-gradient(180deg, #34603f, #284c32); }
+.is-night.season-winter .hill-front { background: linear-gradient(180deg, #8ea3c4, #6c82a6); }
+
+/* Falling petals, leaves, snow or fireflies */
+.particles {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  top: -20px;
+  animation: fall linear infinite;
+}
+
+.petal { width: 10px; height: 7px; border-radius: 60% 0; background: #ffc1d6; }
+.leaf  { width: 12px; height: 8px; border-radius: 0 70%; background: #f08a3c; }
+.snow  { width: 7px;  height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 4px rgba(255, 255, 255, 0.9); }
+
+.firefly {
+  top: auto;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff6a8;
+  box-shadow: 0 0 10px 3px rgba(255, 240, 120, 0.8);
+  animation: firefly ease-in-out infinite alternate;
+}
+
+@keyframes fall {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  50%  { transform: translate(40px, 260px) rotate(200deg); }
+  100% { transform: translate(-20px, 560px) rotate(400deg); }
+}
+
+@keyframes firefly {
+  0%   { transform: translate(0, 0); opacity: 0.2; }
+  50%  { opacity: 1; }
+  100% { transform: translate(40px, -50px); opacity: 0.3; }
+}
+
+.greeting {
+  position: absolute;
+  top: 26px;
+  left: 26px;
+  max-width: 60%;
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1f3a1d;
+}
+
+.is-night .greeting {
+  color: #f3f1d6;
+}
+
+/* ---------- Plants ---------- */
+
+.beds {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 18px 14px;
+  min-height: 300px;
+}
+
+.plant {
+  position: relative;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: pop-in 0.6s var(--bounce) both;
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.8); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Little grass mound under each pot */
+.plant::before {
+  content: '';
+  position: absolute;
+  top: 160px;
+  left: 50%;
+  width: 130px;
+  height: 26px;
+  margin-left: -65px;
+  border-radius: 50%;
+  background: rgba(40, 90, 30, 0.35);
+}
+
+.plant svg {
+  position: relative;
+  width: 140px;
+  height: 180px;
+  overflow: visible;
+  filter: drop-shadow(0 8px 10px rgba(30, 60, 20, 0.2));
+  transition: filter 0.6s;
+}
+
+.plant.thirsty svg {
+  filter: saturate(0.6) drop-shadow(0 8px 10px rgba(30, 60, 20, 0.2));
+}
+
+.plant.wilted svg {
+  filter: saturate(0.25) sepia(0.5) drop-shadow(0 8px 10px rgba(30, 60, 20, 0.2));
+}
+
+/* Plants gently sway in the wind */
+.sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sway 4s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50%      { transform: rotate(2.5deg); }
+}
+
+.wilted .sway,
+.thirsty .sway {
+  animation-duration: 7s;
+}
+
+/* Watering animation */
+.plant.watering svg {
+  animation: happy-jump 0.7s var(--bounce);
+}
+
+@keyframes happy-jump {
+  0%   { transform: scale(1, 1); }
+  30%  { transform: scale(1.08, 0.92); }
+  60%  { transform: scale(0.95, 1.08) translateY(-8px); }
+  100% { transform: scale(1, 1); }
+}
+
+.drops {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 80px;
+  height: 120px;
+  margin-left: -40px;
+  pointer-events: none;
+}
+
+.drops i {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 12px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: var(--water);
+  opacity: 0;
+}
+
+.plant.watering .drops i {
+  animation: drop 0.8s ease-in forwards;
+}
+
+.drops i:nth-child(1) { left: 14px; }
+.drops i:nth-child(2) { left: 36px; animation-delay: 0.12s !important; }
+.drops i:nth-child(3) { left: 58px; animation-delay: 0.24s !important; }
+
+@keyframes drop {
+  0%   { opacity: 0; transform: translateY(-10px); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(110px); }
+}
+
+/* Butterflies around fully bloomed plants */
+.butterfly {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  font-size: 1.3rem;
+  pointer-events: none;
+  animation: flutter 6s ease-in-out infinite;
+}
+
+.butterfly.b2 {
+  font-size: 1rem;
+  animation-duration: 8s;
+  animation-direction: reverse;
+}
+
+@keyframes flutter {
+  0%   { transform: translate(-60px, 20px) rotate(-10deg); }
+  25%  { transform: translate(30px, -20px) rotate(10deg); }
+  50%  { transform: translate(50px, 40px) rotate(-5deg); }
+  75%  { transform: translate(-30px, 0) rotate(8deg); }
+  100% { transform: translate(-60px, 20px) rotate(-10deg); }
+}
+
+/* Plant label card */
+.plant-info {
+  width: 100%;
+  margin-top: -6px;
+  padding: 10px 10px 12px;
+  border-radius: 18px;
+  background: rgba(255, 250, 240, 0.94);
+  box-shadow: 0 8px 20px rgba(30, 60, 20, 0.15);
+  text-align: center;
+}
+
+.plant-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.plant-status {
+  margin: 2px 0 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.plant-status .mood-thirsty { color: var(--thirsty); }
+.plant-status .mood-wilted  { color: var(--wilted); }
+
+.water-btn {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--water);
+  box-shadow: 0 4px 0 #2a8fd4;
+  cursor: pointer;
+  transition: transform 0.25s var(--bounce), box-shadow 0.2s, background 0.2s;
+}
+
+.water-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #2a8fd4;
+}
+
+.water-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #2a8fd4;
+}
+
+.water-btn.done {
+  color: var(--leaf-dark);
+  background: var(--leaf-light);
+  box-shadow: 0 4px 0 #9fd487;
+}
+
+/* Last 7 days as little dots */
+.week-dots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.week-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e2e8da;
+}
+
+.week-dots span.on {
+  background: var(--leaf);
+}
+
+.remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  padding: 4px 9px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.9);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.plant:hover .remove-btn,
+.remove-btn:focus-visible,
+.remove-btn.sure {
+  opacity: 1;
+}
+
+.remove-btn.sure {
+  background: #ffe1e1;
+  color: #c0392b;
+}
+
+/* Empty garden message */
+.empty {
+  position: absolute;
+  left: 50%;
+  bottom: 60px;
+  width: min(420px, 90%);
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 250, 240, 0.95);
+  box-shadow: var(--shadow);
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.empty p {
+  margin-bottom: 12px;
+  color: var(--ink-soft);
+}
+
+/* ---------- Cards below the garden ---------- */
+
+.below {
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr 0.9fr;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.card {
+  padding: 22px;
+  border-radius: var(--radius);
+  background: var(--cream);
+  box-shadow: var(--shadow);
+}
+
+h2 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  color: var(--leaf-dark);
+}
+
+.label {
+  display: block;
+  margin: 14px 0 8px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+#habit-name {
+  width: 100%;
+  padding: 13px 16px;
+  border: 2px solid #e6dcc4;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#habit-name:focus {
+  border-color: var(--leaf);
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.18);
+}
+
+/* Seed choices */
+.seed-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.seed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px 10px;
+  border: 2px solid #eee3cb;
+  border-radius: 16px;
+  background: #fff;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.3s var(--bounce), border-color 0.2s, background 0.2s;
+}
+
+.seed svg {
+  width: 46px;
+  height: 56px;
+}
+
+.seed:hover {
+  transform: translateY(-3px);
+}
+
+.seed.selected {
+  border-color: var(--leaf);
+  background: #effae6;
+}
+
+.form-error {
+  min-height: 1.2em;
+  margin-top: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #c0392b;
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.25s var(--bounce), box-shadow 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+.btn-main {
+  width: 100%;
+  margin-top: 4px;
+  color: #fff;
+  background: var(--leaf);
+  box-shadow: 0 5px 0 var(--leaf-dark);
+}
+
+.btn-main:active {
+  box-shadow: 0 2px 0 var(--leaf-dark);
+}
+
+.btn-light {
+  color: var(--leaf-dark);
+  background: var(--leaf-light);
+  box-shadow: 0 4px 0 #9fd487;
+}
+
+.btn-soft {
+  color: var(--ink-soft);
+  background: var(--cream);
+  box-shadow: var(--shadow);
+  font-size: 0.95rem;
+}
+
+.btn:focus-visible,
+.water-btn:focus-visible,
+.seed:focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 3px;
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.stat {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--cream-2);
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--leaf-dark);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+/* 14-day heatmap */
+.heatmap {
+  display: grid;
+  gap: 6px;
+}
+
+.heat-row {
+  display: grid;
+  grid-template-columns: 90px repeat(14, minmax(0, 1fr));
+  align-items: center;
+  gap: 3px;
+}
+
+.heat-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heat-cell {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: #ece6d6;
+}
+
+.heat-cell.on {
+  background: var(--leaf);
+}
+
+.heat-cell.today {
+  outline: 2px solid var(--sun);
+  outline-offset: 1px;
+}
+
+.heat-empty {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* Growth guide */
+.stages {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.stages li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: var(--cream-2);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.stages b {
+  color: var(--ink);
+}
+
+.guide-note {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Footer */
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* Toast messages for achievements */
+.toasts {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 20;
+  display: grid;
+  gap: 8px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+  animation: toast 3s var(--bounce) forwards;
+}
+
+@keyframes toast {
+  0%   { opacity: 0; transform: translateY(20px) scale(0.9); }
+  12%  { opacity: 1; transform: translateY(0) scale(1); }
+  85%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(10px) scale(0.95); }
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1000px) {
+  .below {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .guide {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .level-box {
+    width: 100%;
+  }
+
+  .below {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .garden {
+    padding: 100px 10px 24px;
+  }
+
+  .greeting {
+    left: 18px;
+    max-width: 62%;
+    font-size: 1.15rem;
+  }
+
+  .sun-moon {
+    width: 58px;
+    height: 58px;
+  }
+
+  .plant {
+    width: calc(50% - 8px);
+  }
+
+  .plant svg {
+    width: 120px;
+    height: 155px;
+  }
+
+  .heat-row {
+    grid-template-columns: 70px repeat(14, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
